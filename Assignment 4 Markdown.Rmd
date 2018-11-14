@@ -1,0 +1,17 @@
+---
+title: "Assignment 4"
+author: "Angie Bouche"
+date: "November 13, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(kableExtra)
+lobster_traps <- read.csv("lobster_traps.csv")
+lobster_size <- read.csv("lobster_size_abundance.csv")
+
+```
+
