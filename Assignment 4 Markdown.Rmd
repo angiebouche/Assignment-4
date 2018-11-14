@@ -5,13 +5,82 @@ date: "November 13, 2018"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup,echo = FALSE, message = FALSE}
 
+#load in packages and data as csvs
 library(tidyverse)
+library(knitr)
 library(kableExtra)
 lobster_traps <- read.csv("lobster_traps.csv")
 lobster_size <- read.csv("lobster_size_abundance.csv")
+
+
+```
+
+
+
+```{r}
+#Make a summary data table for lobster abundance and fishing pressure
+
+
+lobster_count <- lobster_size %>% 
+  filter( SIZE != -99999) %>% #remove negative value
+  select (YEAR, SITE, COUNT) %>% #select relevant years
+  group_by (SITE) %>% 
+  summarize (
+    sum_2012 = sum(COUNT, YEAR == 2012),
+    sum_2013 = sum(COUNT, YEAR == 2013),
+    sum_2014 = sum(COUNT, YEAR == 2014),
+    sum_2015 = sum(COUNT, YEAR == 2015),
+    sum_2016 = sum(COUNT, YEAR == 2016),
+    sum_2017 = sum(COUNT, YEAR == 2017) #find annual sum for 2012-2017
+  )
+
+View (lobster_count) #view new data frame
+
+lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% 
+   kable_styling(bootstrap_options = "striped", full_width = F) #create summary table
+
+
+trap_count <- lobster_traps %>% 
+ select (YEAR, SITE, TRAPS) %>% #select relevant columns
+  group_by (SITE) %>% 
+  summarize (
+    sum_2012 = sum(TRAPS, YEAR == 2012),
+    sum_2013 = sum(TRAPS, YEAR == 2013),
+    sum_2014 = sum(TRAPS, YEAR == 2014),
+    sum_2015 = sum(TRAPS, YEAR == 2015),
+    sum_2016 = sum(TRAPS, YEAR == 2016),
+    sum_2017 = sum(TRAPS, YEAR == 2017) #find annual sum for 2012-2017
+  ) 
+
+View(trap_count)
+
+trap_table <- kable(trap_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% 
+ kable_styling(bootstrap_options = "striped", full_width = F)
+
+View(trap_table)
+
+
+```
+
+
+
+```{r}
+# Make a line graoh of annual lobster abundance at each site
+
+lobster_line <- ggplot (lobster_count, aes( x= YEAR)) +
+  geom_line(fill = SITE)+
+  scale_x_discrete(limits = c(2012, 2013, 2014, 2015, 2016, 2017)) +
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs( y = "Number of Lobsters Counted")
+
+```
+
+
+```{r}
+#Make a line graph of annual lobster fishing pressure at each site
+
 
 ```
 
