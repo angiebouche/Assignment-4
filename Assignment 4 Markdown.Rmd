@@ -96,3 +96,61 @@ trap_line <- ggplot (lobster_count, aes( x = Year)) +
 
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Number 2
+Create data frame where each lobster has its own row, case format using vcdExtra
+```{r}
+
+install.packages("vcdExtra")
+library(vcdExtra)
+
+lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
+
+
+
+```
+
+Exploratory Histogram 
+```{r}
+lobstersize_hist <- ggplot(lobster_expanded, aes(x=SIZE)) +
+  geom_histogram()
+
+lobstersize_hist
+
+#large sample size, normally distributed
+```
+
+Exploratory qqplot
+
+```{r}
+lobstersize_qq <- ggplot(lobster_expanded, aes(sample=SIZE)) +
+  geom_qq()
+
+lobstersize_qq
+
+#large sample size and normally distributed according to qqplot
+
+```
+
+Variance test (Levene's)
+```{r}
+levene.test
+```
+
+
