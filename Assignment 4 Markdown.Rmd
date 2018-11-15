@@ -26,7 +26,7 @@ lobster_size <- read.csv("lobster_size_abundance.csv")
 lobster_count <- lobster_size %>% 
   filter( SIZE != -99999) %>% #remove negative value
   select (YEAR, SITE, COUNT) %>% #select relevant years
-  group_by (SITE) %>% 
+  group_by (SITE)  %>% 
   summarize (
     sum_2012 = sum(COUNT, YEAR == 2012),
     sum_2013 = sum(COUNT, YEAR == 2013),
@@ -41,9 +41,11 @@ View (lobster_count) #view new data frame
 lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% #create summary table and rename columns
    kable_styling(bootstrap_options = "striped", full_width = F) #styling
 
-lobster_table
 
-View(lobster_traps)
+
+```
+
+```{r}
 
 trap_count <- lobster_traps %>% 
  select (YEAR, SITE, TRAPS) %>% #select relevant columns
@@ -63,26 +65,22 @@ trap_count <- lobster_traps %>%
 
 View(trap_count)
 
-trap_table <- kable(trap_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% #create summary table and rename columns
+trap_table <- kable(trap_count, col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>%
  kable_styling(bootstrap_options = "striped", full_width = F) #styling
 
-
-spread() %>% 
-gather() %>% 
-
-
+trap_table
 ```
 
 
 
 ```{r}
-# Make a line graoh of annual lobster abundance at each site
+# Make a line graph of annual lobster abundance at each site
 
 lobster_line <- ggplot (lobster_count, aes( x = Year)) +
   geom_line(aes(fill = Site))+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Number of Lobsters Counted")
+  labs( y = "Number of Lobsters Counted Annually by Site")
 
 ```
 
@@ -90,6 +88,11 @@ lobster_line <- ggplot (lobster_count, aes( x = Year)) +
 ```{r}
 #Make a line graph of annual lobster fishing pressure at each site
 
+trap_line <- ggplot (lobster_count, aes( x = Year)) +
+  geom_line(aes(fill = Site))+
+  scale_x_continuous(limits = c(2012,2017)) +
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs( y = "Number of Traps Counted Annually by Site")
 
 ```
 
