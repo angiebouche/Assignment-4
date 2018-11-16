@@ -17,7 +17,7 @@ lobster_size <- read.csv("lobster_size_abundance.csv")
 
 ```
 
-
+###Part 1A Creating summary data tables 
 
 ```{r}
 #Make a summary data table for lobster abundance and fishing pressure
@@ -45,6 +45,8 @@ lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", 
 
 ```
 
+
+
 ```{r}
 
 trap_count <- lobster_traps %>% 
@@ -71,16 +73,18 @@ trap_table <- kable(trap_count, col.names = c("Site", "2012", "2013", "2014", "2
 trap_table
 ```
 
-
+####Part 1B Creating Summary Line Graphs (Attempting)
 
 ```{r}
 # Make a line graph of annual lobster abundance at each site
 
-lobster_line <- ggplot (lobster_count, aes( x = Year)) +
-  geom_line(aes(fill = Site))+
+lobster_line <- ggplot (lobster_count, aes( x = Year, color = Site)) +
+  geom_line()+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
   labs( y = "Number of Lobsters Counted Annually by Site")
+
+lobster_line
 
 ```
 
@@ -88,11 +92,13 @@ lobster_line <- ggplot (lobster_count, aes( x = Year)) +
 ```{r}
 #Make a line graph of annual lobster fishing pressure at each site
 
-trap_line <- ggplot (lobster_count, aes( x = Year)) +
-  geom_line(aes(fill = Site))+
+trap_line <- ggplot (lobster_count, aes( x = Year, color = Site)) +
+  geom_line()+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
   labs( y = "Number of Traps Counted Annually by Site")
+
+trap_line
 
 ```
 
