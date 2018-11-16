@@ -1,7 +1,7 @@
 ---
 title: "Assignment 4"
-author: "Angie Bouche"
-date: "November 13, 2018"
+author: "Angie Bouche, Andrea Cheung, Tara Jagadeesh"
+date: "November 19, 2018"
 output: html_document
 ---
 
@@ -22,51 +22,29 @@ lobster_size <- read.csv("lobster_size_abundance.csv")
 
 
 ```{r}
-#Make a summary data table for lobster abundance and fishing pressure
+#Make a summary data table for lobster abundance 
 
-
-lobster_count <- lobster_size %>% 
+lobster_count <- lobster_expanded %>% 
   filter(SIZE != -99999) %>% #remove negative value
-  select (YEAR, SITE, COUNT) %>% #select relevant years
+  select (YEAR, SITE) %>% #select relevant years
    group_by(SITE, YEAR) %>% 
   summarize(
-    Sum = length(COUNT)
+    Sum = length(SITE))
  
-test
-    
-lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% #create summary table and rename columns
-   kable_styling(bootstrap_options = "striped", full_width = F) #styling
-
-
-
 ```
 
 ```{r}
-
-trap_count <- lobster_traps %>% 
+#Make a summary data table for fishing pressure
+trap_count <- traps_expanded %>% 
  select (YEAR, SITE, TRAPS) %>% #select relevant columns
-  group_by (SITE) %>%
+  group_by (SITE, YEAR) %>%
   filter(SITE != "ABUR") %>%
   filter(SITE != "AHND to AQUE") %>% 
   filter(SITE != "AHND") %>%  
   filter(SITE != "GOLB") %>%  
-  summarize (
-    sum_2012 = sum(TRAPS, YEAR == 2012),
-    sum_2013 = sum(TRAPS, YEAR == 2013),
-    sum_2014 = sum(TRAPS, YEAR == 2014),
-    sum_2015 = sum(TRAPS, YEAR == 2015),
-    sum_2016 = sum(TRAPS, YEAR == 2016),
-    sum_2017 = sum(TRAPS, YEAR == 2017) #find annual sum for 2012-2017
-  ) %>% 
-  
-  
+  summarize(
+    Sum = length(TRAPS))
 
-View(trap_count)
-
-trap_table <- kable(trap_count, col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>%
- kable_styling(bootstrap_options = "striped", full_width = F) #styling
-
-trap_table
 ```
 
 
@@ -117,20 +95,26 @@ trap_line <- ggplot (lobster_count, aes( x = Year)) +
 Create data frame where each lobster has its own row, case format using vcdExtra
 ```{r}
 
-install.packages("vcdExtra")
 library(vcdExtra)
 
 lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
 
+lobster_expanded2017 <- lobster_expanded %>% 
+  filter(YEAR == 2017) 
 
 
 ```
 
 Exploratory Histogram 
 ```{r}
+<<<<<<< HEAD
 size2017_hist <- ggplot(lobster_expanded, aes(x=SIZE)) +
   geom_histogram()+
   facet_wrap(~SITE, scale = "free")
+=======
+lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
+  geom_histogram()
+>>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
 
 size2017_hist
 
@@ -140,9 +124,14 @@ size2017_hist
 Exploratory qqplot
 
 ```{r}
+<<<<<<< HEAD
 size2017_qq <- ggplot(lobster_expanded, aes(sample=SIZE)) +
   geom_qq()+
   facet_wrap(~SITE, scale = "free")
+=======
+lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
+  geom_qq()
+>>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
 
 size2017_qq
 
@@ -152,9 +141,25 @@ size2017_qq
 
 Variance test (Levene's)
 ```{r}
-levene.test
+# install car package to compute levene's test
+library(car)
+
+# Levene's test with one independent variable
+leveneTest(SIZE ~ SITE, data = lobster_expanded2017)
+
+# low P value, according to the pvalue, variance is not equal, but its less than 4x. 
+
 ```
 
+One way ANOVA - is there a difference between two or more means?
+```{r}
+lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
+lobstersize_aov
+
+summary(lobstersize_aov)
+```
+
+<<<<<<< HEAD
 ## Number 3
 Histogram and qqplots for 2012 
 ```{r}
@@ -306,17 +311,37 @@ size_graph
 
 ```{r}
 
+=======
+Post-hoc Tukey's test
+```{r}
+tukey <- TukeyHSD(lobstersize_aov)
+
+tukey
 ```
 
-
+Graph data
 ```{r}
+library(ggplot2)
 
-lobstersize2017_box <-ggplot(lobster_expanded2017, aes(x=SITE, y= SIZE, fill = SITE)) + 
-  geom_boxplot() +
-  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
-  theme(legend.position="none", aspect.ratio = 1.2/1) 
+lobster_size_2017 <- lobster_expanded2017 %>% 
+  filter(YEAR == 2017) %>% 
+  group_by(SITE) %>% 
+  summarize(meansize = mean(SIZE),
+            sd=round(sd(SIZE), digits = 2),
+            sample_size = length(SITE))
+
+lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
+  geom_col(colour = "black", width = 0.5, stat = "identity") +
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of \nlobsters by location in 2017") +
+  geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.2)+
+  theme_classic()+ 
+  scale_y_continuous(expand = c(0,0), limits = c(0,125))+
+  theme(legend.position="none", aspect.ratio = 1.2/1)
+  
+# Mean carapace length (mm) of lobsters at five locations: Arroyo Quemado (AQUE), Carpinteria (CARP), Isla Vista (IVEE), Mohawk Reef (MOHK), Naples Reef (NAPL). Error bars indicate ± 1 standard deviation (n=67, n=705, n=606, n=178, n=112, respectively). Mean carapace length of lobsters only differed significantly between NAPL and IVEE, and NAPL and CARP. (one-way ANOVA, F(4,1663) = 3.42, p = 0.0085) with post-hoc Tukey’s HSD (α = 0.05). 
 
 
-lobstersize2017_box
+lobstersize2017_figure
+>>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
 ```
 
