@@ -11,6 +11,8 @@ output: html_document
 library(tidyverse)
 library(knitr)
 library(kableExtra)
+library(effsize)
+
 lobster_traps <- read.csv("lobster_traps.csv")
 lobster_size <- read.csv("lobster_size_abundance.csv")
 
@@ -24,19 +26,12 @@ lobster_size <- read.csv("lobster_size_abundance.csv")
 
 
 lobster_count <- lobster_size %>% 
-  filter( SIZE != -99999) %>% #remove negative value
+  filter(SIZE != -99999) %>% #remove negative value
   select (YEAR, SITE, COUNT) %>% #select relevant years
-  group_by (SITE)  %>% 
-  summarize (
-    sum_2012 = sum(COUNT, YEAR == 2012),
-    sum_2013 = sum(COUNT, YEAR == 2013),
-    sum_2014 = sum(COUNT, YEAR == 2014),
-    sum_2015 = sum(COUNT, YEAR == 2015),
-    sum_2016 = sum(COUNT, YEAR == 2016),
-    sum_2017 = sum(COUNT, YEAR == 2017) #find annual sum for 2012-2017
-  )
-
-View (lobster_count) #view new data frame
+   group_by(SITE, YEAR) %>% 
+  summarize(
+    Sum = length(COUNT)
+ 
 
 lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% #create summary table and rename columns
    kable_styling(bootstrap_options = "striped", full_width = F) #styling
@@ -61,7 +56,9 @@ trap_count <- lobster_traps %>%
     sum_2015 = sum(TRAPS, YEAR == 2015),
     sum_2016 = sum(TRAPS, YEAR == 2016),
     sum_2017 = sum(TRAPS, YEAR == 2017) #find annual sum for 2012-2017
-  ) 
+  ) %>% 
+  
+  
 
 View(trap_count)
 
@@ -76,11 +73,13 @@ trap_table
 ```{r}
 # Make a line graph of annual lobster abundance at each site
 
-lobster_line <- ggplot (lobster_count, aes( x = Year)) +
-  geom_line(aes(fill = Site))+
+
+counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum)) +
+  geom_line(aes(fill = SITE))+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Number of Lobsters Counted Annually by Site")
+  labs( y = "Lobster Abundance")
+counts_line
 
 ```
 
@@ -128,10 +127,11 @@ lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
 
 Exploratory Histogram 
 ```{r}
-lobstersize_hist <- ggplot(lobster_expanded, aes(x=SIZE)) +
-  geom_histogram()
+size2017_hist <- ggplot(lobster_expanded, aes(x=SIZE)) +
+  geom_histogram()+
+  facet_wrap(~SITE, scale = "free")
 
-lobstersize_hist
+size2017_hist
 
 #large sample size, normally distributed
 ```
@@ -139,10 +139,11 @@ lobstersize_hist
 Exploratory qqplot
 
 ```{r}
-lobstersize_qq <- ggplot(lobster_expanded, aes(sample=SIZE)) +
-  geom_qq()
+size2017_qq <- ggplot(lobster_expanded, aes(sample=SIZE)) +
+  geom_qq()+
+  facet_wrap(~SITE, scale = "free")
 
-lobstersize_qq
+size2017_qq
 
 #large sample size and normally distributed according to qqplot
 
@@ -153,4 +154,156 @@ Variance test (Levene's)
 levene.test
 ```
 
+## Number 3
+Histogram and qqplots for 2012 
+```{r}
+size2012_hist <- lobster_expanded %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(x = SIZE)) +
+  geom_histogram()+
+  facet_wrap(~SITE, scale = "free")
+size2012_hist
+
+size2012_qq <- lobster_expanded %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(sample=SIZE)) +
+  geom_qq()+
+  facet_wrap(~SITE, scale = "free")
+size2012_qq
+```
+
+
+
+```{r}
+#Question: is there a difference in mean lobster size between 2012 and 2017?
+
+size_simple <- lobster_expanded %>% 
+  filter(YEAR == "2012" | YEAR == "2017") %>% 
+  select("YEAR", "SITE", "SIZE")
+  
+#IVEE t-test
+ivee_ttest <- size_simple %>% 
+  filter(SITE == "IVEE") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+ivee_ttest
+
+#NAPL t-test
+napl_ttest <- size_simple %>% 
+  filter(SITE == "NAPL") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+napl_ttest
+
+#AQUE t-test
+aque_ttest <- size_simple %>% 
+  filter(SITE == "AQUE") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+aque_ttest
+
+#CARP t-test
+carp_ttest <- size_simple %>% 
+  filter(SITE == "CARP") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+carp_ttest
+
+#MOHK t-test
+mohk_ttest <- size_simple %>% 
+  filter(SITE == "MOHK") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+mohk_ttest
+
+```
+
+or if separate.....
+
+Histogram, qqplot, F test
+```{r}
+#Make a simplified dataframe with data from just 2012 and 2017, then designate sites as MPA or NONMPA
+ssize_simple <- lobster_expanded %>% 
+  filter(YEAR == "2012" | YEAR == "2017") %>% 
+  select("YEAR", "SITE", "SIZE") %>% 
+  mutate(sitetype = case_when( 
+      SITE == "IVEE" ~ "MPA",
+      SITE == "NAPL" ~ "MPA",
+      SITE == "AQUE" ~ "NONMPA",
+      SITE == "CARP" ~ "NONMPA",
+      SITE == "MOHK" ~ "NONMPA",
+      ))
+
+#Histograms for lobster size 2012
+ssize2012_hist <- ssize_simple %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(x = SIZE)) +
+  geom_histogram()+
+  facet_wrap(~sitetype, scale = "free")
+ssize2012_hist
+
+#QQplot for lobster size 2012
+ssize2012_qq <- ssize_simple %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(sample=SIZE)) +
+  geom_qq()+
+  facet_wrap(~sitetype, scale = "free")
+ssize2012_qq
+
+#F test for MPA
+MPA_ftest <- ssize_simple %>% 
+  filter(sitetype == "MPA") %>% 
+  var.test(SIZE ~ YEAR, data = .)
+MPA_ftest #Equal variance
+
+#F test for NONMPA
+NONMPA_ftest <- ssize_simple %>% 
+  filter(sitetype == "NONMPA") %>% 
+  var.test(SIZE ~ YEAR, data = .)
+NONMPA_ftest #Equal variance
+```
+
+
+T-tests and effect size
+```{r}
+#MPA t-test
+MPA_ttest <- ssize_simple %>% 
+  filter(sitetype == "MPA") %>% 
+  t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
+MPA_ttest #No sig difference
+
+#MPA effect size
+MPA_effectsize <- ssize_simple %>% 
+  filter(sitetype == "MPA") %>% 
+  cohen.d(SIZE ~ YEAR, data = .)
+MPA_effectsize #small
+
+#NONMPA t-test
+NONMPA_ttest <- ssize_simple %>% 
+  filter(sitetype == "NONMPA") %>% 
+  t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
+NONMPA_ttest #Sig difference
+
+#NONMPA effect size
+NONMPA_effectsize <- ssize_simple %>% 
+  filter(sitetype == "NONMPA") %>% 
+  cohen.d(SIZE ~ YEAR, data = .)
+NONMPA_effectsize #small
+```
+
+Graph of results
+```{r}
+#Summary table of mean lobster size for MPA and NONMPA sites in 2012 and 2017
+size_means <- ssize_simple %>% 
+  group_by(sitetype, YEAR) %>% 
+  summarize(
+    Mean = mean(SIZE)
+  )
+size_means
+
+size_graph <- size_means %>% 
+  ggplot(aes(x = YEAR, y = Mean, fill = sitetype))+
+  geom_col(position = "dodge")
+  
+size_graph
+```
+
+```{r}
+
+```
 
