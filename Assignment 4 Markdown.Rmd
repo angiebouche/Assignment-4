@@ -8,40 +8,44 @@ output: html_document
 ```{r setup,echo = FALSE, message = FALSE}
 
 #load in packages and data as csvs
+library(vcdExtra)
 library(tidyverse)
 library(knitr)
 library(kableExtra)
 lobster_traps <- read.csv("lobster_traps.csv")
 lobster_size <- read.csv("lobster_size_abundance.csv")
 
+View(lobster_traps)
 
 ```
 
 ###Part 1A Creating summary data tables 
 
 ```{r}
+
+#Coerce data into counts
+lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
+
+traps_expanded <- expand.dft(lobster_traps, freq="TRAPS")
+
+
+```
+
+
+```{r}
 #Make a summary data table for lobster abundance and fishing pressure
 
-
-lobster_count <- lobster_size %>% 
+lobster_count <- lobster_expanded %>% 
   filter( SIZE != -99999) %>% #remove negative value
-  select (YEAR, SITE, COUNT) %>% #select relevant years
-  group_by (SITE)  %>% 
-  summarize (
-    sum_2012 = sum(COUNT, YEAR == 2012),
-    sum_2013 = sum(COUNT, YEAR == 2013),
-    sum_2014 = sum(COUNT, YEAR == 2014),
-    sum_2015 = sum(COUNT, YEAR == 2015),
-    sum_2016 = sum(COUNT, YEAR == 2016),
-    sum_2017 = sum(COUNT, YEAR == 2017) #find annual sum for 2012-2017
-  )
-
+  count (YEAR, SITE) %>% #select relevant years
+  spread(SITE, n)#find annual sum for 2012-2017
+  
 View (lobster_count) #view new data frame
 
-lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% #create summary table and rename columns
+lobster_table <- kable(lobster_count, col.names = c("Year", "Arroyo Quemado", "Carpinteria", "Isla Vista", "Mohawk", "Naples")) %>% #create summary table and rename columns
    kable_styling(bootstrap_options = "striped", full_width = F) #styling
 
-
+lobster_table
 
 ```
 
@@ -49,28 +53,21 @@ lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", 
 
 ```{r}
 
-trap_count <- lobster_traps %>% 
- select (YEAR, SITE, TRAPS) %>% #select relevant columns
-  group_by (SITE) %>%
+trap_count <- traps_expanded %>% 
+  count (YEAR, SITE) %>% #select relevant columns
   filter(SITE != "ABUR") %>%
   filter(SITE != "AHND to AQUE") %>% 
   filter(SITE != "AHND") %>%  
   filter(SITE != "GOLB") %>%  
-  summarize (
-    sum_2012 = sum(TRAPS, YEAR == 2012),
-    sum_2013 = sum(TRAPS, YEAR == 2013),
-    sum_2014 = sum(TRAPS, YEAR == 2014),
-    sum_2015 = sum(TRAPS, YEAR == 2015),
-    sum_2016 = sum(TRAPS, YEAR == 2016),
-    sum_2017 = sum(TRAPS, YEAR == 2017) #find annual sum for 2012-2017
-  ) 
-
+  spread(SITE, n) #find annual sum for 2012-2017
+  
 View(trap_count)
 
-trap_table <- kable(trap_count, col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>%
+trap_table <- kable(lobster_count, col.names = c("Year", "Arroyo Quemado", "Carpinteria", "Isla Vista", "Mohawk", "Naples")) %>% 
  kable_styling(bootstrap_options = "striped", full_width = F) #styling
 
 trap_table
+
 ```
 
 ####Part 1B Creating Summary Line Graphs (Attempting)
@@ -78,7 +75,7 @@ trap_table
 ```{r}
 # Make a line graph of annual lobster abundance at each site
 
-lobster_line <- ggplot (lobster_count, aes( x = Year, color = Site)) +
+lobster_line <- ggplot (lobster_count, aes( x = YEAR, color = Site)) +
   geom_line()+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
@@ -92,7 +89,7 @@ lobster_line
 ```{r}
 #Make a line graph of annual lobster fishing pressure at each site
 
-trap_line <- ggplot (lobster_count, aes( x = Year, color = Site)) +
+trap_line <- ggplot (trap_count, aes(x = YEAR, color = Site )) +
   geom_line()+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
@@ -122,9 +119,6 @@ trap_line
 ## Number 2
 Create data frame where each lobster has its own row, case format using vcdExtra
 ```{r}
-
-install.packages("vcdExtra")
-library(vcdExtra)
 
 lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
 
@@ -156,6 +150,7 @@ lobstersize_qq
 
 Variance test (Levene's)
 ```{r}
+
 levene.test
 ```
 
