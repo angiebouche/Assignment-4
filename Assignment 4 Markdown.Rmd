@@ -201,3 +201,15 @@ lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill
 lobstersize2017_figure
 ```
 
+
+```{r}
+
+lobstersize2017_box <-ggplot(lobster_expanded2017, aes(x=SITE, y= SIZE, fill = SITE)) + 
+  geom_boxplot() +
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
+  theme(legend.position="none", aspect.ratio = 1.2/1) 
+
+
+lobstersize2017_box
+```
+
