@@ -412,5 +412,6 @@ lobster_chitable
 lobster_x2 <- chisq.test(lobster_chitable) #run x2 test
 lobster_x2
 
+# There is a significant association between the the sample location and the number of legal minimum carapace size for lobsters (86.6 mm). (X2(4) = 18.497, p < 0.001).
 
 ```
