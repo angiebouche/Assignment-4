@@ -1,0 +1,416 @@
+---
+title: "Assignment 4"
+author: "Angie Bouche, Andrea Cheung, Tara Jagadeesh"
+date: "November 19, 2018"
+output: html_document
+---
+
+```{r setup,echo = FALSE, message = FALSE}
+
+#load in packages and data as csvs
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(effsize)
+
+lobster_traps <- read.csv("lobster_traps.csv")
+lobster_size <- read.csv("lobster_size_abundance.csv")
+
+
+```
+
+
+
+```{r}
+#Make a summary data table for lobster abundance 
+
+lobster_count <- lobster_expanded %>% 
+  filter(SIZE != -99999) %>% #remove negative value
+  select (YEAR, SITE) %>% #select relevant years
+   group_by(SITE, YEAR) %>% 
+  summarize(
+    Sum = length(SITE))
+ 
+```
+
+```{r}
+#Make a summary data table for fishing pressure
+trap_count <- traps_expanded %>% 
+ select (YEAR, SITE, TRAPS) %>% #select relevant columns
+  group_by (SITE, YEAR) %>%
+  filter(SITE != "ABUR") %>%
+  filter(SITE != "AHND to AQUE") %>% 
+  filter(SITE != "AHND") %>%  
+  filter(SITE != "GOLB") %>%  
+  summarize(
+    Sum = length(TRAPS))
+
+```
+
+
+
+```{r}
+# Make a line graph of annual lobster abundance at each site
+
+
+counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum)) +
+  geom_line(aes(fill = SITE))+
+  scale_x_continuous(limits = c(2012,2017)) +
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs( y = "Lobster Abundance")
+counts_line
+
+```
+
+
+```{r}
+#Make a line graph of annual lobster fishing pressure at each site
+
+trap_line <- ggplot (lobster_count, aes( x = Year)) +
+  geom_line(aes(fill = Site))+
+  scale_x_continuous(limits = c(2012,2017)) +
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs( y = "Number of Traps Counted Annually by Site")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Number 2
+Create data frame where each lobster has its own row, case format using vcdExtra
+```{r}
+
+library(vcdExtra)
+
+lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
+
+lobster_expanded2017 <- lobster_expanded %>% 
+  filter(YEAR == 2017) 
+
+
+```
+
+Exploratory Histogram 
+```{r}
+<<<<<<< HEAD
+size2017_hist <- ggplot(lobster_expanded, aes(x=SIZE)) +
+  geom_histogram()+
+  facet_wrap(~SITE, scale = "free")
+=======
+lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
+  geom_histogram()
+>>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
+
+size2017_hist
+
+#large sample size, normally distributed
+```
+
+Exploratory qqplot
+
+```{r}
+<<<<<<< HEAD
+size2017_qq <- ggplot(lobster_expanded, aes(sample=SIZE)) +
+  geom_qq()+
+  facet_wrap(~SITE, scale = "free")
+=======
+lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
+  geom_qq()
+>>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
+
+size2017_qq
+
+#large sample size and normally distributed according to qqplot
+
+```
+
+Variance test (Levene's)
+```{r}
+# install car package to compute levene's test
+library(car)
+
+# Levene's test with one independent variable
+leveneTest(SIZE ~ SITE, data = lobster_expanded2017)
+
+# low P value, according to the pvalue, variance is not equal, but its less than 4x. 
+
+```
+
+One way ANOVA - is there a difference between two or more means?
+```{r}
+lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
+lobstersize_aov
+
+summary(lobstersize_aov)
+```
+
+<<<<<<< HEAD
+
+## Number 2
+Create data frame where each lobster has its own row, case format using vcdExtra
+```{r}
+
+library(vcdExtra)
+
+lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
+
+lobster_expanded2017 <- lobster_expanded %>% 
+  filter(YEAR == 2017) 
+
+
+```
+
+Exploratory Histogram 
+```{r}
+lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
+  geom_histogram()
+
+lobstersize_hist
+
+#large sample size, normally distributed
+```
+
+Exploratory qqplot
+
+```{r}
+lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
+  geom_qq()
+
+lobstersize_qq
+
+#large sample size and normally distributed according to qqplot
+
+```
+
+Variance test (Levene's)
+```{r}
+# install car package to compute levene's test
+library(car)
+
+# Levene's test with one independent variable
+leveneTest(SIZE ~ SITE, data = lobster_expanded2017)
+
+# low P value, according to the pvalue, variance is not equal, but its less than 4x. 
+
+```
+
+One way ANOVA - is there a difference between two or more means?
+```{r}
+lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
+lobstersize_aov
+
+summary(lobstersize_aov)
+```
+
+
+Post-hoc Tukey's test
+```{r}
+tukey <- TukeyHSD(lobstersize_aov)
+
+tukey
+```
+
+Graph data
+```{r}
+library(ggplot2)
+
+lobster_size_2017 <- lobster_expanded2017 %>% 
+  filter(YEAR == 2017) %>% 
+  group_by(SITE) %>% 
+  summarize(meansize = mean(SIZE),
+            sd=round(sd(SIZE), digits = 2),
+            sample_size = length(SITE))
+
+lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
+  geom_col(colour = "black", width = 0.5, stat = "identity") +
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of \nlobsters by location in 2017") +
+  geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.2)+
+  theme_classic()+ 
+  scale_y_continuous(expand = c(0,0), limits = c(0,125))+
+  theme(legend.position="none", aspect.ratio = 1.2/1)
+  
+# Mean carapace length (mm) of lobsters at five locations: Arroyo Quemado (AQUE), Carpinteria (CARP), Isla Vista (IVEE), Mohawk Reef (MOHK), Naples Reef (NAPL). Error bars indicate ± 1 standard deviation (n=67, n=705, n=606, n=178, n=112, respectively). Mean carapace length of lobsters only differed significantly between NAPL and IVEE, and NAPL and CARP. (one-way ANOVA, F(4,1663) = 3.42, p = 0.0085) with post-hoc Tukey’s HSD (α = 0.05). 
+
+
+lobstersize2017_figure
+```
+
+Boxplot
+```{r}
+
+lobstersize2017_box <-ggplot(lobster_expanded2017, aes(x=SITE, y= SIZE, fill = SITE)) + 
+  geom_boxplot() +
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
+  theme(legend.position="none", aspect.ratio = 1.2/1) 
+
+
+lobstersize2017_box
+```
+
+
+## Number 3
+Histogram and qqplots for 2012 
+```{r}
+size2012_hist <- lobster_expanded %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(x = SIZE)) +
+  geom_histogram()+
+  facet_wrap(~SITE, scale = "free")
+size2012_hist
+
+size2012_qq <- lobster_expanded %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(sample=SIZE)) +
+  geom_qq()+
+  facet_wrap(~SITE, scale = "free")
+size2012_qq
+```
+
+
+
+```{r}
+#Question: is there a difference in mean lobster size between 2012 and 2017?
+
+size_simple <- lobster_expanded %>% 
+  filter(YEAR == "2012" | YEAR == "2017") %>% 
+  select("YEAR", "SITE", "SIZE")
+  
+#IVEE t-test
+ivee_ttest <- size_simple %>% 
+  filter(SITE == "IVEE") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+ivee_ttest
+
+#NAPL t-test
+napl_ttest <- size_simple %>% 
+  filter(SITE == "NAPL") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+napl_ttest
+
+#AQUE t-test
+aque_ttest <- size_simple %>% 
+  filter(SITE == "AQUE") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+aque_ttest
+
+#CARP t-test
+carp_ttest <- size_simple %>% 
+  filter(SITE == "CARP") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+carp_ttest
+
+#MOHK t-test
+mohk_ttest <- size_simple %>% 
+  filter(SITE == "MOHK") %>% 
+  t.test(SIZE ~ YEAR, data = .)
+mohk_ttest
+
+```
+
+or if separate.....
+
+Histogram, qqplot, F test
+```{r}
+#Make a simplified dataframe with data from just 2012 and 2017, then designate sites as MPA or NONMPA
+ssize_simple <- lobster_expanded %>% 
+  filter(YEAR == "2012" | YEAR == "2017") %>% 
+  select("YEAR", "SITE", "SIZE") %>% 
+  mutate(sitetype = case_when( 
+      SITE == "IVEE" ~ "MPA",
+      SITE == "NAPL" ~ "MPA",
+      SITE == "AQUE" ~ "NONMPA",
+      SITE == "CARP" ~ "NONMPA",
+      SITE == "MOHK" ~ "NONMPA",
+      ))
+
+#Histograms for lobster size 2012
+ssize2012_hist <- ssize_simple %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(x = SIZE)) +
+  geom_histogram()+
+  facet_wrap(~sitetype, scale = "free")
+ssize2012_hist
+
+#QQplot for lobster size 2012
+ssize2012_qq <- ssize_simple %>% 
+  filter(YEAR == "2012") %>% 
+  ggplot(aes(sample=SIZE)) +
+  geom_qq()+
+  facet_wrap(~sitetype, scale = "free")
+ssize2012_qq
+
+#F test for MPA
+MPA_ftest <- ssize_simple %>% 
+  filter(sitetype == "MPA") %>% 
+  var.test(SIZE ~ YEAR, data = .)
+MPA_ftest #Equal variance
+
+#F test for NONMPA
+NONMPA_ftest <- ssize_simple %>% 
+  filter(sitetype == "NONMPA") %>% 
+  var.test(SIZE ~ YEAR, data = .)
+NONMPA_ftest #Equal variance
+```
+
+
+T-tests and effect size
+```{r}
+#MPA t-test
+MPA_ttest <- ssize_simple %>% 
+  filter(sitetype == "MPA") %>% 
+  t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
+MPA_ttest #No sig difference
+
+#MPA effect size
+MPA_effectsize <- ssize_simple %>% 
+  filter(sitetype == "MPA") %>% 
+  cohen.d(SIZE ~ YEAR, data = .)
+MPA_effectsize #small
+
+#NONMPA t-test
+NONMPA_ttest <- ssize_simple %>% 
+  filter(sitetype == "NONMPA") %>% 
+  t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
+NONMPA_ttest #Sig difference
+
+#NONMPA effect size
+NONMPA_effectsize <- ssize_simple %>% 
+  filter(sitetype == "NONMPA") %>% 
+  cohen.d(SIZE ~ YEAR, data = .)
+NONMPA_effectsize #small
+```
+
+Graph of results
+```{r}
+#Summary table of mean lobster size for MPA and NONMPA sites in 2012 and 2017
+size_means <- ssize_simple %>% 
+  group_by(sitetype, YEAR) %>% 
+  summarize(
+    Mean = mean(SIZE)
+  )
+size_means
+
+size_graph <- size_means %>% 
+  ggplot(aes(x = YEAR, y = Mean, fill = sitetype))+
+  geom_col(position = "dodge")
+  
+size_graph
+```
+
+
+
