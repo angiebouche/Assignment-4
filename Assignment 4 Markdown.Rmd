@@ -1,7 +1,7 @@
 ---
 title: "Assignment 4"
-author: "Angie Bouche"
-date: "November 13, 2018"
+author: "Angie Bouche, Andrea Cheung, Tara Jagadeesh"
+date: "November 19, 2018"
 output: html_document
 ---
 
@@ -120,15 +120,22 @@ trap_line
 Create data frame where each lobster has its own row, case format using vcdExtra
 ```{r}
 
+<<<<<<< HEAD
+=======
+library(vcdExtra)
+
+>>>>>>> d50b55e6d1b4149c2714c0799ca4a10bb3700566
 lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
 
+lobster_expanded2017 <- lobster_expanded %>% 
+  filter(YEAR == 2017) 
 
 
 ```
 
 Exploratory Histogram 
 ```{r}
-lobstersize_hist <- ggplot(lobster_expanded, aes(x=SIZE)) +
+lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
   geom_histogram()
 
 lobstersize_hist
@@ -139,7 +146,7 @@ lobstersize_hist
 Exploratory qqplot
 
 ```{r}
-lobstersize_qq <- ggplot(lobster_expanded, aes(sample=SIZE)) +
+lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
   geom_qq()
 
 lobstersize_qq
@@ -150,8 +157,56 @@ lobstersize_qq
 
 Variance test (Levene's)
 ```{r}
+<<<<<<< HEAD
 
 levene.test
+=======
+# install car package to compute levene's test
+library(car)
+
+# Levene's test with one independent variable
+leveneTest(SIZE ~ SITE, data = lobster_expanded2017)
+
+# low P value, according to the pvalue, variance is not equal, but its less than 4x. 
+
 ```
 
+One way ANOVA - is there a difference between two or more means?
+```{r}
+lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
+lobstersize_aov
+```
+
+Post-hoc Tukey's test
+```{r}
+tukey <- TukeyHSD(lobstersize_aov)
+
+tukey
+>>>>>>> d50b55e6d1b4149c2714c0799ca4a10bb3700566
+```
+
+Graph data
+```{r}
+library(ggplot2)
+
+lobster_size_2017 <- lobster_expanded2017 %>% 
+  filter(YEAR == 2017) %>% 
+  group_by(SITE) %>% 
+  summarize(meansize = mean(SIZE),
+            sd=round(sd(SIZE), digits = 2))
+
+lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
+  geom_col(colour = "black", width = 0.5, stat = "identity") +
+  labs(x = "Location", y = "Size (mm)", title = "Mean lobster size by location in 2017") +
+  geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.1)+
+  theme_classic()+ 
+  scale_y_continuous(expand = c(0,0), limits = c(0,150))+
+  theme(legend.position="none")
+  
+
+
+
+
+lobstersize2017_figure
+```
 
