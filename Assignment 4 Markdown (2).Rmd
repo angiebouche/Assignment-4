@@ -16,6 +16,9 @@ library(effsize)
 lobster_traps <- read.csv("lobster_traps.csv")
 lobster_size <- read.csv("lobster_size_abundance.csv")
 
+lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
+traps_expanded <- expand.dft(lobster_traps, freq="TRAPS")
+
 
 ```
 
@@ -36,14 +39,14 @@ lobster_count <- lobster_expanded %>%
 ```{r}
 #Make a summary data table for fishing pressure
 trap_count <- traps_expanded %>% 
- select (YEAR, SITE, TRAPS) %>% #select relevant columns
+ select (YEAR, SITE) %>% #select relevant columns
   group_by (SITE, YEAR) %>%
   filter(SITE != "ABUR") %>%
   filter(SITE != "AHND to AQUE") %>% 
   filter(SITE != "AHND") %>%  
   filter(SITE != "GOLB") %>%  
   summarize(
-    Sum = length(TRAPS))
+    Sum = length(SITE))
 
 ```
 
@@ -52,12 +55,11 @@ trap_count <- traps_expanded %>%
 ```{r}
 # Make a line graph of annual lobster abundance at each site
 
-
 counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum)) +
   geom_line(aes(fill = SITE))+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Lobster Abundance")
+  labs( y = "Lobster Abundance", x = "Year")
 counts_line
 
 ```
@@ -66,28 +68,14 @@ counts_line
 ```{r}
 #Make a line graph of annual lobster fishing pressure at each site
 
-trap_line <- ggplot (lobster_count, aes( x = Year)) +
-  geom_line(aes(fill = Site))+
+trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum)) +
+  geom_line(aes(fill = SITE))+
   scale_x_continuous(limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Number of Traps Counted Annually by Site")
+  labs( y = "Number of Traps", x = "Year")
+trap_line
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
