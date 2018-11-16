@@ -182,16 +182,15 @@ lobster_size_2017 <- lobster_expanded2017 %>%
   filter(YEAR == 2017) %>% 
   group_by(SITE) %>% 
   summarize(meansize = mean(SIZE),
-            sd=round(sd(SIZE), digits = 2)
-             )
-
+            sd=round(sd(SIZE), digits = 2))
 
 lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
   geom_col(colour = "black", width = 0.5, stat = "identity") +
   labs(x = "Location", y = "Size (mm)", title = "Mean lobster size by location in 2017") +
   geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.1)+
   theme_classic()+ 
-  scale_y_continuous(expand = c(0,0), limits = c(0,150))
+  scale_y_continuous(expand = c(0,0), limits = c(0,150))+
+  theme(legend.position="none")
   
 
 
