@@ -165,6 +165,8 @@ One way ANOVA - is there a difference between two or more means?
 ```{r}
 lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
 lobstersize_aov
+
+summary(lobstersize_aov)
 ```
 
 Post-hoc Tukey's test
@@ -182,18 +184,18 @@ lobster_size_2017 <- lobster_expanded2017 %>%
   filter(YEAR == 2017) %>% 
   group_by(SITE) %>% 
   summarize(meansize = mean(SIZE),
-            sd=round(sd(SIZE), digits = 2))
+            sd=round(sd(SIZE), digits = 2),
+            sample_size = length(SITE))
 
 lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
   geom_col(colour = "black", width = 0.5, stat = "identity") +
-  labs(x = "Location", y = "Size (mm)", title = "Mean lobster size by location in 2017") +
-  geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.1)+
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of \nlobsters by location in 2017") +
+  geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.2)+
   theme_classic()+ 
-  scale_y_continuous(expand = c(0,0), limits = c(0,150))+
-  theme(legend.position="none")
+  scale_y_continuous(expand = c(0,0), limits = c(0,125))+
+  theme(legend.position="none", aspect.ratio = 1.2/1)
   
-
-
+# Mean carapace length (mm) of lobsters at five locations: Arroyo Quemado (AQUE), Carpinteria (CARP), Isla Vista (IVEE), Mohawk Reef (MOHK), Naples Reef (NAPL). Error bars indicate ± 1 standard deviation (n=67, n=705, n=606, n=178, n=112, respectively). Mean carapace length of lobsters only differed significantly between NAPL and IVEE, and NAPL and CARP. (one-way ANOVA, F(4,1663) = 3.42, p = 0.0085) with post-hoc Tukey’s HSD (α = 0.05). 
 
 
 lobstersize2017_figure
