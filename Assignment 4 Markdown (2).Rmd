@@ -160,6 +160,109 @@ summary(lobstersize_aov)
 ```
 
 <<<<<<< HEAD
+
+## Number 2
+Create data frame where each lobster has its own row, case format using vcdExtra
+```{r}
+
+library(vcdExtra)
+
+lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
+
+lobster_expanded2017 <- lobster_expanded %>% 
+  filter(YEAR == 2017) 
+
+
+```
+
+Exploratory Histogram 
+```{r}
+lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
+  geom_histogram()
+
+lobstersize_hist
+
+#large sample size, normally distributed
+```
+
+Exploratory qqplot
+
+```{r}
+lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
+  geom_qq()
+
+lobstersize_qq
+
+#large sample size and normally distributed according to qqplot
+
+```
+
+Variance test (Levene's)
+```{r}
+# install car package to compute levene's test
+library(car)
+
+# Levene's test with one independent variable
+leveneTest(SIZE ~ SITE, data = lobster_expanded2017)
+
+# low P value, according to the pvalue, variance is not equal, but its less than 4x. 
+
+```
+
+One way ANOVA - is there a difference between two or more means?
+```{r}
+lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
+lobstersize_aov
+
+summary(lobstersize_aov)
+```
+
+
+Post-hoc Tukey's test
+```{r}
+tukey <- TukeyHSD(lobstersize_aov)
+
+tukey
+```
+
+Graph data
+```{r}
+library(ggplot2)
+
+lobster_size_2017 <- lobster_expanded2017 %>% 
+  filter(YEAR == 2017) %>% 
+  group_by(SITE) %>% 
+  summarize(meansize = mean(SIZE),
+            sd=round(sd(SIZE), digits = 2),
+            sample_size = length(SITE))
+
+lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
+  geom_col(colour = "black", width = 0.5, stat = "identity") +
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of \nlobsters by location in 2017") +
+  geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.2)+
+  theme_classic()+ 
+  scale_y_continuous(expand = c(0,0), limits = c(0,125))+
+  theme(legend.position="none", aspect.ratio = 1.2/1)
+  
+# Mean carapace length (mm) of lobsters at five locations: Arroyo Quemado (AQUE), Carpinteria (CARP), Isla Vista (IVEE), Mohawk Reef (MOHK), Naples Reef (NAPL). Error bars indicate ± 1 standard deviation (n=67, n=705, n=606, n=178, n=112, respectively). Mean carapace length of lobsters only differed significantly between NAPL and IVEE, and NAPL and CARP. (one-way ANOVA, F(4,1663) = 3.42, p = 0.0085) with post-hoc Tukey’s HSD (α = 0.05). 
+
+
+lobstersize2017_figure
+```
+
+Boxplot
+```{r}
+
+lobstersize2017_box <-ggplot(lobster_expanded2017, aes(x=SITE, y= SIZE, fill = SITE)) + 
+  geom_boxplot() +
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
+  theme(legend.position="none", aspect.ratio = 1.2/1) 
+
+
+lobstersize2017_box
+```
+
+
 ## Number 3
 Histogram and qqplots for 2012 
 ```{r}
@@ -310,107 +413,4 @@ size_graph
 ```
 
 
-
-
-## Number 2
-Create data frame where each lobster has its own row, case format using vcdExtra
-```{r}
-
-library(vcdExtra)
-
-lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
-
-lobster_expanded2017 <- lobster_expanded %>% 
-  filter(YEAR == 2017) 
-
-
-```
-
-Exploratory Histogram 
-```{r}
-lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
-  geom_histogram()
-
-lobstersize_hist
-
-#large sample size, normally distributed
-```
-
-Exploratory qqplot
-
-```{r}
-lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
-  geom_qq()
-
-lobstersize_qq
-
-#large sample size and normally distributed according to qqplot
-
-```
-
-Variance test (Levene's)
-```{r}
-# install car package to compute levene's test
-library(car)
-
-# Levene's test with one independent variable
-leveneTest(SIZE ~ SITE, data = lobster_expanded2017)
-
-# low P value, according to the pvalue, variance is not equal, but its less than 4x. 
-
-```
-
-One way ANOVA - is there a difference between two or more means?
-```{r}
-lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
-lobstersize_aov
-
-summary(lobstersize_aov)
-```
-
-
-Post-hoc Tukey's test
-```{r}
-tukey <- TukeyHSD(lobstersize_aov)
-
-tukey
-```
-
-Graph data
-```{r}
-library(ggplot2)
-
-lobster_size_2017 <- lobster_expanded2017 %>% 
-  filter(YEAR == 2017) %>% 
-  group_by(SITE) %>% 
-  summarize(meansize = mean(SIZE),
-            sd=round(sd(SIZE), digits = 2),
-            sample_size = length(SITE))
-
-lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
-  geom_col(colour = "black", width = 0.5, stat = "identity") +
-  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of \nlobsters by location in 2017") +
-  geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.2)+
-  theme_classic()+ 
-  scale_y_continuous(expand = c(0,0), limits = c(0,125))+
-  theme(legend.position="none", aspect.ratio = 1.2/1)
-  
-# Mean carapace length (mm) of lobsters at five locations: Arroyo Quemado (AQUE), Carpinteria (CARP), Isla Vista (IVEE), Mohawk Reef (MOHK), Naples Reef (NAPL). Error bars indicate ± 1 standard deviation (n=67, n=705, n=606, n=178, n=112, respectively). Mean carapace length of lobsters only differed significantly between NAPL and IVEE, and NAPL and CARP. (one-way ANOVA, F(4,1663) = 3.42, p = 0.0085) with post-hoc Tukey’s HSD (α = 0.05). 
-
-
-lobstersize2017_figure
-```
-
-Boxplot
-```{r}
-
-lobstersize2017_box <-ggplot(lobster_expanded2017, aes(x=SITE, y= SIZE, fill = SITE)) + 
-  geom_boxplot() +
-  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
-  theme(legend.position="none", aspect.ratio = 1.2/1) 
-
-
-lobstersize2017_box
-```
-```
 
