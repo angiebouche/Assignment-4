@@ -96,14 +96,13 @@ lobster_expanded2017 <- lobster_expanded %>%
 
 Exploratory Histogram 
 ```{r}
-<<<<<<< HEAD
 size2017_hist <- ggplot(lobster_expanded, aes(x=SIZE)) +
   geom_histogram()+
   facet_wrap(~SITE, scale = "free")
-=======
+
 lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
   geom_histogram()
->>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
+
 
 size2017_hist
 
@@ -113,14 +112,13 @@ size2017_hist
 Exploratory qqplot
 
 ```{r}
-<<<<<<< HEAD
+
 size2017_qq <- ggplot(lobster_expanded, aes(sample=SIZE)) +
   geom_qq()+
   facet_wrap(~SITE, scale = "free")
-=======
+
 lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
   geom_qq()
->>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
 
 size2017_qq
 
@@ -388,3 +386,31 @@ size_graph
 
 
 
+##Number 4 
+Chi Square
+
+```{r}
+
+
+
+lobster_chitable <- lobster_expanded2017 %>% 
+  filter(YEAR == 2017) %>% 
+  mutate(
+    Size = case_when(
+      SIZE >= 82.6 ~ "greater than",
+      SIZE <= 82.6 ~ "less than")) %>% 
+  select(SITE, Size) %>% 
+  count(Size, SITE) %>% 
+  spread(SITE, n) %>% 
+  select(-Size)
+
+
+rownames(lobster_chitable) <- c("greater than", "less than")
+lobster_chitable
+
+
+lobster_x2 <- chisq.test(lobster_chitable) #run x2 test
+lobster_x2
+
+
+```
