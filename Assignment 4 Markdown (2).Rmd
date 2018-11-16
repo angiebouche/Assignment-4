@@ -56,11 +56,13 @@ trap_count <- traps_expanded %>%
 ```{r}
 # Make a line graph of annual lobster abundance at each site
 
-counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum)) +
+counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum, color = SITE)) +
   geom_line(aes(fill = SITE))+
-  scale_x_continuous(limits = c(2012,2017)) +
+  scale_x_continuous(expand = c(0,0), limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Lobster Abundance", x = "Year")
+  labs( y = "Lobster Abundance", x = "Year")+
+  theme_classic()
+
 counts_line
 
 ```
@@ -69,11 +71,12 @@ counts_line
 ```{r}
 #Make a line graph of annual lobster fishing pressure at each site
 
-trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum)) +
+trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
   geom_line(aes(fill = SITE))+
-  scale_x_continuous(limits = c(2012,2017)) +
+  scale_x_continuous(expand = c(0,0), limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Number of Traps", x = "Year")
+  labs( y = "Number of Traps", x = "Year")+
+  theme_classic()
 trap_line
 
 ```
