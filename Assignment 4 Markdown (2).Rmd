@@ -309,9 +309,66 @@ size_graph <- size_means %>%
 size_graph
 ```
 
+
+
+
+## Number 2
+Create data frame where each lobster has its own row, case format using vcdExtra
 ```{r}
 
-=======
+library(vcdExtra)
+
+lobster_expanded <- expand.dft(lobster_size, freq="COUNT")
+
+lobster_expanded2017 <- lobster_expanded %>% 
+  filter(YEAR == 2017) 
+
+
+```
+
+Exploratory Histogram 
+```{r}
+lobstersize_hist <- ggplot(lobster_expanded2017, aes(x=SIZE)) +
+  geom_histogram()
+
+lobstersize_hist
+
+#large sample size, normally distributed
+```
+
+Exploratory qqplot
+
+```{r}
+lobstersize_qq <- ggplot(lobster_expanded2017, aes(sample=SIZE)) +
+  geom_qq()
+
+lobstersize_qq
+
+#large sample size and normally distributed according to qqplot
+
+```
+
+Variance test (Levene's)
+```{r}
+# install car package to compute levene's test
+library(car)
+
+# Levene's test with one independent variable
+leveneTest(SIZE ~ SITE, data = lobster_expanded2017)
+
+# low P value, according to the pvalue, variance is not equal, but its less than 4x. 
+
+```
+
+One way ANOVA - is there a difference between two or more means?
+```{r}
+lobstersize_aov <- aov(SIZE ~ SITE, data = lobster_expanded2017)
+lobstersize_aov
+
+summary(lobstersize_aov)
+```
+
+
 Post-hoc Tukey's test
 ```{r}
 tukey <- TukeyHSD(lobstersize_aov)
@@ -342,6 +399,18 @@ lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill
 
 
 lobstersize2017_figure
->>>>>>> 6831ffcf4ef9f6688967038c5be1b5d5a5bd501f
+```
+
+Boxplot
+```{r}
+
+lobstersize2017_box <-ggplot(lobster_expanded2017, aes(x=SITE, y= SIZE, fill = SITE)) + 
+  geom_boxplot() +
+  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
+  theme(legend.position="none", aspect.ratio = 1.2/1) 
+
+
+lobstersize2017_box
+```
 ```
 
