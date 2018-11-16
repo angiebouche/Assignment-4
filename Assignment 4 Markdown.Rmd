@@ -32,7 +32,8 @@ lobster_count <- lobster_size %>%
   summarize(
     Sum = length(COUNT)
  
-
+test
+    
 lobster_table <- kable(lobster_count, align = "c",col.names = c("Site", "2012", "2013", "2014", "2015", "2016", "2017")) %>% #create summary table and rename columns
    kable_styling(bootstrap_options = "striped", full_width = F) #styling
 
