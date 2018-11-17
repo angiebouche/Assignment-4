@@ -13,6 +13,7 @@ library(knitr)
 library(kableExtra)
 library(effsize)
 library(reshape2)
+library(RColorBrewer)
 
 lobster_traps <- read.csv("lobster_traps.csv")
 lobster_size <- read.csv("lobster_size_abundance.csv")
@@ -57,13 +58,15 @@ trap_count <- traps_expanded %>%
 # Make a line graph of annual lobster abundance at each site
 
 counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum, color = SITE)) +
-  geom_line(aes(fill = SITE))+
+  geom_line(aes(fill = SITE), size = 1.2)+
   scale_x_continuous(expand = c(0,0), limits = c(2012,2017)) +
   theme(plot.title = element_text(hjust = 0.5))+
   labs( y = "Lobster Abundance", x = "Year")+
+  guides(fill = guide_legend(title = "Site"))+
+  scale_color_brewer(palette="Accent")+
   theme_classic()
 
-counts_line
+counts_line+ labs(color="Site")
 
 ```
 
@@ -72,12 +75,14 @@ counts_line
 #Make a line graph of annual lobster fishing pressure at each site
 
 trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
-  geom_line(aes(fill = SITE))+
-  scale_x_continuous(expand = c(0,0), limits = c(2012,2017)) +
+  geom_line(aes(fill = SITE),size=1.2)+
+  scale_x_continuous(expand = c(0,0), limits = c(2012,2017))+
   theme(plot.title = element_text(hjust = 0.5))+
   labs( y = "Number of Traps", x = "Year")+
+  scale_color_brewer(palette="Accent")+
   theme_classic()
-trap_line
+  
+trap_line+labs(color="Site")
 
 ```
 
