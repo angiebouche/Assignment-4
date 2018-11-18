@@ -83,8 +83,55 @@ trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
   scale_color_brewer(palette="Accent")+
   theme_classic()
   
+
+counts_line + labs(color="Site")counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum, color = SITE)) +
+  geom_line(aes(fill = SITE), size = 1.2)+
+  scale_x_continuous(expand = c(0,0), limits = c(2012,2017)) +
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs( y = "Lobster Abundance", x = "Year")+
+  guides(fill = guide_legend(title = "Site"))+
+  scale_color_brewer(palette="Dark2")+
+  theme_classic()
+
+counts_line + labs(color="Site")
+
+```
+
+
+```{r}
+#Make a line graph of annual lobster fishing pressure at each site
+
+trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
+  geom_line(aes(fill = SITE),size=1.2)+
+  scale_x_continuous(expand = c(0,0), limits = c(2012,2017))+
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs( y = "Number of Traps", x = "Year")+
+  scale_color_brewer(palette="Dark2")+
+  theme_classic()
+  
 trap_line + scale_color_manual(breaks = c("AQUE", "CARP", "MOHK"),
-                        values=c("lightgreen", "plum", "#FFFF99"))
+                        values=c("mediumseagreen", "orangered", "deeppink"))+
+   labs(color="Site")
+
+```
+
+
+```{r}
+#Make a line graph of annual lobster fishing pressure at each site
+
+trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
+  geom_line(aes(fill = SITE),size=1.2)+
+  scale_x_continuous(expand = c(0,0), limits = c(2012,2017))+
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs( y = "Number of Traps", x = "Year")+
+  scale_color_brewer(palette="Dark2")+
+  theme_classic()
+
+  
+  
+trap_line + scale_color_manual(breaks = c("AQUE", "CARP", "MOHK"),
+                        values=c("mediumseagreen", "orangered", "deeppink"))+
+   labs(color="Site")
 
 ```
 
@@ -243,7 +290,7 @@ lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill
   annotate("text", x = 4, y = 85, label = "a", family = "Century Schoolbook") +
   annotate("text", x = 5, y = 91, label = "b", family = "Century Schoolbook") +
   theme_classic()+ 
-  scale_fill_brewer(palette = "Accent")+
+  scale_fill_brewer(palette = "Dark2")+
   scale_y_continuous(expand = c(0,0), limits = c(0,125))+
   theme(legend.position="none", aspect.ratio = 1.2/1)
   
