@@ -67,7 +67,7 @@ counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum, color = SITE)) +
   scale_color_brewer(palette="Accent")+
   theme_classic()
 
-counts_line+ labs(color="Site")
+counts_line + labs(color="Site")
 
 ```
 
@@ -83,7 +83,8 @@ trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
   scale_color_brewer(palette="Accent")+
   theme_classic()
   
-trap_line+labs(color="Site")
+trap_line + scale_color_manual(breaks = c("AQUE", "CARP", "MOHK"),
+                        values=c("lightgreen", "plum", "#FFFF99"))
 
 ```
 
