@@ -64,39 +64,12 @@ counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum, color = SITE)) +
   theme(plot.title = element_text(hjust = 0.5))+
   labs( y = "Lobster Abundance", x = "Year")+
   guides(fill = guide_legend(title = "Site"))+
-  scale_color_brewer(palette="Accent")+
-  theme_classic()
-
-counts_line + labs(color="Site")
-
-```
-
-
-```{r}
-#Make a line graph of annual lobster fishing pressure at each site
-
-trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
-  geom_line(aes(fill = SITE),size=1.2)+
-  scale_x_continuous(expand = c(0,0), limits = c(2012,2017))+
-  theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Number of Traps", x = "Year")+
-  scale_color_brewer(palette="Accent")+
-  theme_classic()
-  
-
-counts_line + labs(color="Site")counts_line <- ggplot (lobster_count, aes(x = YEAR, y = Sum, color = SITE)) +
-  geom_line(aes(fill = SITE), size = 1.2)+
-  scale_x_continuous(expand = c(0,0), limits = c(2012,2017)) +
-  theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Lobster Abundance", x = "Year")+
-  guides(fill = guide_legend(title = "Site"))+
   scale_color_brewer(palette="Dark2")+
   theme_classic()
 
 counts_line + labs(color="Site")
 
 ```
-
 
 ```{r}
 #Make a line graph of annual lobster fishing pressure at each site
@@ -115,25 +88,6 @@ trap_line + scale_color_manual(breaks = c("AQUE", "CARP", "MOHK"),
 
 ```
 
-
-```{r}
-#Make a line graph of annual lobster fishing pressure at each site
-
-trap_line <- ggplot (trap_count, aes(x = YEAR, y = Sum, color = SITE)) +
-  geom_line(aes(fill = SITE),size=1.2)+
-  scale_x_continuous(expand = c(0,0), limits = c(2012,2017))+
-  theme(plot.title = element_text(hjust = 0.5))+
-  labs( y = "Number of Traps", x = "Year")+
-  scale_color_brewer(palette="Dark2")+
-  theme_classic()
-
-  
-  
-trap_line + scale_color_manual(breaks = c("AQUE", "CARP", "MOHK"),
-                        values=c("mediumseagreen", "orangered", "deeppink"))+
-   labs(color="Site")
-
-```
 
 
 
@@ -282,7 +236,7 @@ lobster_size_2017 <- lobster_expanded2017 %>%
 
 lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill = SITE)) + 
   geom_col(colour = "black", width = 0.5, stat = "identity") +
-  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of \nlobsters by location in 2017") +
+  labs(x = "Location", y = "Carapace Length (mm)") +
   geom_errorbar(aes(ymin=meansize-sd, ymax=meansize+sd), width=.2)+
   annotate("text", x = 1, y = 90, label = "a") +
   annotate("text", x = 2, y = 89, label = "a,b", family = "Century Schoolbook") +
@@ -304,20 +258,20 @@ Boxplot
 ```{r}
 
 newdfbox <- lobster_expanded2017  %>% 
-  mutate(siteorder = factor(SITE, 
-                                    levels = c("NAPL", "IVEE", "AQUE", "MOHK", "CARP"))) #
+  mutate(siteorder = factor(SITE, levels = c("NAPL", "IVEE", "AQUE", "MOHK", "CARP"))) #
 
 
 lobstersize2017_box <-ggplot(newdfbox, aes(x=siteorder, y= SIZE, fill = siteorder)) + 
   geom_boxplot() +
-  labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
+  theme(legend.position="none")+
+  labs(x = "Location", y = "Carapace Length (mm)", scale = "free") +
   annotate("text", x = 1, y = 109, label = "b") +
   annotate("text", x = 2, y = 107, label = "a,b", family = "Century Schoolbook") +
   annotate("text", x = 3, y = 108, label = "a", family = "Century Schoolbook") +
   annotate("text", x = 4, y = 98, label = "a", family = "Century Schoolbook") +
   annotate("text", x = 5, y = 109, label = "a,b", family = "Century Schoolbook") +
-  scale_fill_brewer(palette = "Accent")+
-  theme(legend.position="none", aspect.ratio = 1.2/1) 
+  scale_fill_brewer(palette = "Dark2")+
+  theme_classic()
 
 
 lobstersize2017_box
