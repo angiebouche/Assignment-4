@@ -405,8 +405,16 @@ size_means12 <- lobster_size  %>%
   select(YEAR, SITE, SIZE) %>% 
   group_by(SITE) %>% 
   summarize (
-     "2012" = mean(SIZE))
+     "2012" = mean(SIZE),
+     SD2012 = sd(SIZE))
 
+size_SD12 <- lobster_size  %>% 
+  filter(SIZE != -99999, YEAR == "2012") %>% 
+  select(YEAR, SITE, SIZE) %>% 
+  group_by(SITE) %>% 
+  summarize (
+     "SD2012" = sd(SIZE))
+  
 #Dataframe of average lobster size for each site in 2017
 size_means17 <- lobster_size  %>% 
   filter(SIZE != -99999, YEAR == "2017") %>% 
@@ -414,22 +422,45 @@ size_means17 <- lobster_size  %>%
   group_by(SITE) %>% 
   summarize (
      "2017" = mean(SIZE))
+
+size_SD17 <- lobster_size  %>% 
+  filter(SIZE != -99999, YEAR == "2017") %>% 
+  select(YEAR, SITE, SIZE) %>% 
+  group_by(SITE) %>% 
+  summarize (
+     "SD2017" = sd(SIZE))
   
 #Combine dataframes to have one table with means from 2012 and 2017
 size_means <- merge(size_means12, size_means17, by="SITE")
-size_means
 
+size_SDs <- merge(size_SD12, size_SD17, by="SITE")
 
+#Change size_means dataframe so that it works for the graph
 size_melt <- melt(size_means[,c('SITE','2012','2017')],id.vars = 1)
+
+size_melt2 <- melt(size_SDs[,c('SITE','SD2012','SD2017')],id.vars = 1) %>% 
+  select(SITE, value) 
+
+#Reorder the columns 
+columnorder <- c("NAPL", "IVEE", "AQUE", "MOHK", "CARP")
 
 
 size_graph <- size_melt %>% 
-  ggplot(aes(x = SITE, y = value))+
-  geom_bar(aes(fill = variable),position = "dodge", stat="identity")
-  
+  ggplot(aes(x = SITE, y = value, group = variable))+
+  geom_bar(color = "black", aes(fill = variable), position = "dodge", stat= "identity", width=0.85)+
+  scale_x_discrete(limits = columnorder)+
+  theme_classic()+
+  xlab("\nSite")+
+  ylab("Mean Lobster Carapace Length (mm)\n")+
+  labs(fill = "Year")+
+  scale_y_continuous(expand = c(0,0), limits = c(0,100),breaks = seq(0, 100,by = 10))+
+  geom_errorbar(aes(ymin = value - size_melt2$value, ymax = value + size_melt2$value), width=.15, position = position_dodge(0.85))+
+    scale_fill_brewer(palette = "Blues")+
+  annotate("text", x = 5, y = 95, label = "*") 
+
+
 size_graph
 ```
-
 
 
 ##Number 4 
