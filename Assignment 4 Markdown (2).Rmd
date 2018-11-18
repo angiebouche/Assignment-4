@@ -242,6 +242,7 @@ lobstersize2017_figure <-ggplot(lobster_size_2017, aes(x=SITE, y= meansize, fill
   annotate("text", x = 4, y = 85, label = "a", family = "Century Schoolbook") +
   annotate("text", x = 5, y = 91, label = "b", family = "Century Schoolbook") +
   theme_classic()+ 
+  scale_fill_brewer(palette = "Accent")+
   scale_y_continuous(expand = c(0,0), limits = c(0,125))+
   theme(legend.position="none", aspect.ratio = 1.2/1)
   
@@ -257,6 +258,12 @@ Boxplot
 lobstersize2017_box <-ggplot(lobster_expanded2017, aes(x=SITE, y= SIZE, fill = SITE)) + 
   geom_boxplot() +
   labs(x = "Location", y = "Carapace Length (mm)", title = "Mean carapace length (mm) of lobsters \nby location in 2017", scale = "free") +
+  annotate("text", x = 1, y = 109, label = "a") +
+  annotate("text", x = 2, y = 109, label = "a,b", family = "Century Schoolbook") +
+  annotate("text", x = 3, y = 106, label = "a,b", family = "Century Schoolbook") +
+  annotate("text", x = 4, y = 98, label = "a", family = "Century Schoolbook") +
+  annotate("text", x = 5, y = 109, label = "b", family = "Century Schoolbook") +
+  scale_fill_brewer(palette = "Accent")+
   theme(legend.position="none", aspect.ratio = 1.2/1) 
 
 
