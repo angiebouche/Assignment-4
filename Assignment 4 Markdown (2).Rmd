@@ -391,32 +391,29 @@ mohk_effectsize #0.5408116 (medium)
 Graph of results
 ```{r}
 #Summary table of mean lobster size for MPA and NONMPA sites in 2012 and 2017
-size_means <- lobster_size  %>% 
-  filter(SIZE != -99999, YEAR == "2012" | YEAR == "2017") %>% 
-  select(YEAR, SITE, SIZE)%>% 
-  group_by(SITE) %>% 
-  aggregate(SIZE ~ SITE+YEAR, data= ., FUN=mean)
 
+#Dataframe of average lobster size for each site in 2012
+size_means12 <- lobster_size  %>% 
+  filter(SIZE != -99999, YEAR == "2012") %>% 
+  select(YEAR, SITE, SIZE) %>% 
+  group_by(SITE) %>% 
+  summarize (
+     "2012" = mean(SIZE))
+
+#Dataframe of average lobster size for each site in 2017
+size_means17 <- lobster_size  %>% 
+  filter(SIZE != -99999, YEAR == "2017") %>% 
+  select(YEAR, SITE, SIZE) %>% 
+  group_by(SITE) %>% 
+  summarize (
+     "2017" = mean(SIZE))
+  
+#Combine dataframes to have one table with means from 2012 and 2017
+size_means <- merge(size_means12, size_means17, by="SITE")
 size_means
 
-lobster_count <- lobster_size %>% 
-   filter( SIZE != -99999) %>% #remove negative value
-   select (YEAR, SITE, COUNT) %>% #select relevant years
-   group_by (SITE)  %>% 
-   summarize (
-     sum_2012 = sum(COUNT, YEAR == 2012),
-     sum_2013 = sum(COUNT, YEAR == 2013),
-     sum_2014 = sum(COUNT, YEAR == 2014),
-     sum_2015 = sum(COUNT, YEAR == 2015),
-     sum_2016 = sum(COUNT, YEAR == 2016),
-     sum_2017 = sum(COUNT, YEAR == 2017) #find annual sum for 2012-2017
-   )
- 
-  
 
-
-
-size_melt <- melt(size_means[,c('SITE','YEAR','Mean')],id.vars = 1)
+size_melt <- melt(size_means[,c('SITE','2012','2017')],id.vars = 1)
 
 
 size_graph <- size_melt %>% 
