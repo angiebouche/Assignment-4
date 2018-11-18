@@ -264,7 +264,7 @@ newdfbox <- lobster_expanded2017  %>%
 lobstersize2017_box <-ggplot(newdfbox, aes(x=siteorder, y= SIZE, fill = siteorder)) + 
   geom_boxplot() +
   theme(legend.position="none")+
-  labs(x = "Location", y = "Carapace Length (mm)", scale = "free") +
+  labs(x = "\nSite", y = "Mean Lobster Carapace Length (mm)", scale = "free") +
   annotate("text", x = 1, y = 109, label = "b") +
   annotate("text", x = 2, y = 107, label = "a,b", family = "Century Schoolbook") +
   annotate("text", x = 3, y = 108, label = "a", family = "Century Schoolbook") +
@@ -341,7 +341,7 @@ size_simple <- lobster_expanded %>%
 ivee_ttest <- size_simple %>% 
   filter(SITE == "IVEE") %>% 
   t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
-ivee_ttest
+ivee_ttest #t = -1.885, df = 630, p-value = 0.0599
 
 ivee_effectsize <- size_simple %>% 
   filter(SITE == "IVEE") %>% 
@@ -352,7 +352,7 @@ ivee_effectsize #0.3775177 (small)
 napl_ttest <- size_simple %>% 
   filter(SITE == "NAPL") %>% 
   t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
-napl_ttest
+napl_ttest #t = -0.67636, df = 116, p-value = 0.5002
 
 napl_effectsize <- size_simple %>% 
   filter(SITE == "NAPL") %>% 
@@ -363,7 +363,7 @@ napl_effectsize #0.2834216 (small)
 aque_ttest <- size_simple %>% 
   filter(SITE == "AQUE") %>% 
   t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
-aque_ttest
+aque_ttest #t = -1.2622, df = 103, p-value = 0.2097
 
 aque_effectsize <- size_simple %>% 
   filter(SITE == "AQUE") %>% 
@@ -374,7 +374,7 @@ aque_effectsize #0.2563169 (small)
 carp_ttest <- size_simple %>% 
   filter(SITE == "CARP") %>% 
   t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
-carp_ttest
+carp_ttest #t = 1.3361, df = 781, p-value = 0.1819
 
 carp_effectsize <- size_simple %>% 
   filter(SITE == "CARP") %>% 
@@ -385,7 +385,7 @@ carp_effectsize #0.1594364 (negligible)
 mohk_ttest <- size_simple %>% 
   filter(SITE == "MOHK") %>% 
   t.test(SIZE ~ YEAR, var.equal = TRUE, data = .)
-mohk_ttest
+mohk_ttest #t = 4.0689, df = 259, p-value = 6.276e-05
 
 mohk_effectsize <- size_simple %>% 
   filter(SITE == "MOHK") %>% 
@@ -456,7 +456,7 @@ size_graph <- size_melt %>%
   scale_y_continuous(expand = c(0,0), limits = c(0,100),breaks = seq(0, 100,by = 10))+
   geom_errorbar(aes(ymin = value - size_melt2$value, ymax = value + size_melt2$value), width=.15, position = position_dodge(0.85))+
     scale_fill_brewer(palette = "Blues")+
-  annotate("text", x = 5, y = 95, label = "*") 
+  annotate("text", x = 4, y = 95, label = "*") 
 
 
 size_graph
